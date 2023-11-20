@@ -7,22 +7,20 @@ editor: visual
 
 ## **17.4 Time spans**
 
-We\'ll learn about how arithmetic with dates works, including subtraction, addition, and division. Along the way, you\'ll learn about three important classes that represent time spans:
+We'll learn about how arithmetic with dates works, including subtraction, addition, and division. Along the way, you'll learn about three important classes that represent time spans:
 
 -   **Durations**, which represent an exact number of seconds.
 
 -   **Periods**, which represent human units like weeks and months.
 
--   **Intervals**, which represent a starting and ending point.
-
-How do you pick between duration, periods, and intervals? As always, pick the simplest data structure that solves your problem. If you only care about physical time, use a duration; if you need to add human times, use a period; if you need to figure out how long a span is in human units, use an interval.
+How do you pick between duration, periods ? As always, pick the simplest data structure that solves your problem. If you only care about physical time, use a duration; if you need to add human times, use a period.
 
 This chapter will focus on the **lubridate** package, which makes it easier to work with dates and times in R. As of the latest tidyverse release, lubridate is part of core tidyverse. We will also need nycflights13 for practice data.
 
 ```{r}
 library(tidyverse)
 library(nycflights13)
-library(lubridate)
+library(lubridate) #for older tidyverse versions
 ```
 
 ### **17.4.1 Durations**
@@ -60,7 +58,7 @@ dweeks(3)
 dyears(1)
 ```
 
-Durations always record the time span in seconds. Larger units are created by converting minutes, hours, days, weeks, and years to seconds: 60 seconds in a minute, 60 minutes in an hour, 24 hours in a day, and 7 days in a week. Larger time units are more problematic. A year uses the \"average\" number of days in a year, i.e. 365.25. There\'s no way to convert a month to a duration, because there\'s just too much variation.
+Durations always record the time span in seconds. Larger units are created by converting minutes, hours, days, weeks, and years to seconds: 60 seconds in a minute, 60 minutes in an hour, 24 hours in a day, and 7 days in a week. Larger time units are more problematic. A year uses the "average" number of days in a year, i.e. 365.25. There's no way to convert a month to a duration, because there's just too much variation.
 
 You can add and multiply durations:
 
@@ -95,11 +93,11 @@ one_am
 one_am + ddays(1)
 ```
 
-Why is one day after 1am March 8, 2am March 9? If you look carefully at the date you might also notice that the time zones have changed. March 8 only has 23 hours because it\'s when DST starts, so if we add a full days worth of seconds we end up with a different time.
+Why is one day after 1am March 8, 2am March 9? If you look carefully at the date you might also notice that the time zones have changed. March 8 only has 23 hours because it's when DST starts, so if we add a full days worth of seconds we end up with a different time.
 
 ### **17.4.2 Periods**
 
-To solve this problem, lubridate provides **periods**. Periods are time spans but don\'t have a fixed length in seconds, instead they work with \"human\" times, like days and months. That allows them to work in a more intuitive way:
+To solve this problem, lubridate provides **periods**. Periods are time spans but don't have a fixed length in seconds, instead they work with "human" times, like days and months. That allows them to work in a more intuitive way:
 
 ```{r}
 
@@ -144,7 +142,7 @@ one_am + ddays(1)
 one_am + days(1)
 ```
 
-The times are represented in a slightly odd format, so we use modulus arithmetic to pull out the hour and minute components. Once we\'ve created the date-time variables, we focus in on the variables we\'ll explore in the rest of the chapter.
+The times are represented in a slightly odd format, so we use modulus arithmetic to pull out the hour and minute components. Once we've created the date-time variables, we focus in on the variables we'll explore in the rest of the chapter.
 
 ```{r}
 
@@ -165,7 +163,7 @@ flights_dt <- flights |>
 flights_dt
 ```
 
-Let\'s use periods to fix an oddity related to our flight dates. Some planes appear to have arrived at their destination *before* they departed from New York City.
+Let's use periods to fix an oddity related to our flight dates. Some planes appear to have arrived at their destination *before* they departed from New York City.
 
 ```{r}
 
@@ -193,6 +191,10 @@ flights_dt |>
   filter(arr_time < dep_time) 
 ```
 
+```{r}
+flights_dt
+```
+
 ## Additional exercises
 
 *Calculating Elapsed Time between Two Specific Dates:*
@@ -203,7 +205,9 @@ start_date <- ymd("1994-12-21")
 
 end_date <- ymd("2023-11-21")  
 
-elapsed_time <- end_date - start_date  
+elapsed_time <- end_date - start_date 
+
+elapsed_time #difftime class obejct
 
 cat("Elapsed time:", as.duration(elapsed_time), "\n")
 ```
@@ -287,32 +291,44 @@ filtered_dates <- date_vector[date_vector + days(3) < today()]
 filtered_dates
 ```
 
-In additions, we can create intervals :
+If the **`period`** object explicitly specifies only the number of weeks (**`weeks = 2`**). When you print the **`my_period`** object, it represents 14 days, but it doesn't include any information about years, months, hours, minutes, or seconds because those components were not specified.
+
+In Lubridate, when you create a **`period`** object and only specify one or more components (e.g., weeks), the other components are assumed to be zero. In following case, we only specified weeks, so the result shows 14 days and zeros for other components.
 
 ```{r}
-# Working with time intervals
+# Create a period of 2 weeks
+my_period <- period(weeks = 2)
 
-# Creating an interval
+# Display the period
+print(my_period)
 
-interval <- interval(today(), today() + hours(5))
+# Access components of the period
+cat("Years:", year(my_period), "\n")
+cat("Months:", month(my_period), "\n")
+cat("Days:", day(my_period), "\n")
+cat("Hours:", hour(my_period), "\n")
+cat("Minutes:", minute(my_period), "\n")
+cat("Seconds:", second(my_period), "\n")
 
-interval
 ```
 
-Then, it is possible to check if the spesific date is within an interval of not :
+To create a period with more components, you need to specify them explicitly. For example:
 
 ```{r}
-# Checking if a date is within an interval
+# Create a period of 2 weeks, 3 days, 4 hours, 30 minutes, and 15 seconds
+my_period <- period(weeks = 2, days = 3, hours = 4, minutes = 30, seconds = 15)
 
-one_hour_time <- today() + hours(1)
+# Display the period
+print(my_period)
 
-check_within_interval <- one_hour_time %within% interval
+# Access components of the period
+cat("Years:", year(my_period), "\n")
+cat("Months:", month(my_period), "\n")
+cat("Days:", day(my_period), "\n")
+cat("Hours:", hour(my_period), "\n")
+cat("Minutes:", minute(my_period), "\n")
+cat("Seconds:", second(my_period), "\n")
 
-check_within_interval
-
-three_weeks_past = today() - weeks(3)
-
-check_within_interval_past <- three_weeks_past %within% interval
-
-check_within_interval_past
 ```
+
+This will create a **`period`** object that includes the specified values for weeks, days, hours, minutes, and seconds.
