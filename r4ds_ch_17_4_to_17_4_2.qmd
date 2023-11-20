@@ -11,7 +11,19 @@ We'll learn about how arithmetic with dates works, including subtraction, additi
 
 -   **Durations**, which represent an exact number of seconds.
 
+    -   **Precision:** Durations provide precise measurements of time in seconds, minutes, hours, etc.
+
+    -   **Use Case:** Suitable for scenarios where the exact time difference between two points in time needs to be calculated, such as in financial calculations (e.g., loan duration).
+
+    -   **Representation:** Represents an exact number of seconds and is not affected by variations in the number of days in months or years.
+
 -   **Periods**, which represent human units like weeks and months.
+
+    -   **Granularity:** Periods are more human-centric, providing a way to represent time in terms of weeks, months, and years.
+
+    -   **Use Case:** Suitable for scenarios where the focus is on calendar units and variations in the number of days (e.g., project planning).
+
+    -   **Representation:** Represents a length of time in terms of human-readable units, accommodating differences in the number of days in months and years.
 
 How do you pick between duration, periods ? As always, pick the simplest data structure that solves your problem. If you only care about physical time, use a duration; if you need to add human times, use a period.
 
