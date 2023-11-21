@@ -7,11 +7,11 @@ editor: visual
 
 ## **17.4 Time spans**
 
-We'll learn about how arithmetic with dates works, including subtraction, addition, and division. Along the way, you'll learn about three important classes that represent time spans:
+We'll learn about how arithmetic with dates works, including subtraction, addition, and division. Along the way, you'll learn about two important classes that represent time spans:
 
 -   **Durations**, which represent an exact number of seconds.
 
-    -   **Precision:** Durations provide precise measurements of time in seconds, minutes, hours, etc.
+    -   **Precision:** Durations provide precise measurements of time in seconds.
 
     -   **Use Case:** Suitable for scenarios where the exact time difference between two points in time needs to be calculated, such as in financial calculations (e.g., loan duration).
 
@@ -63,7 +63,6 @@ dminutes(10)
 dhours(c(12, 24))
 
 ddays(0:5)
-
 
 dweeks(3)
 
@@ -178,9 +177,21 @@ flights_dt
 Let's use periods to fix an oddity related to our flight dates. Some planes appear to have arrived at their destination *before* they departed from New York City.
 
 ```{r}
-
 flights_dt |> 
   filter(arr_time < dep_time)
+
+```
+
+Lets show some of these physically impossible flights times:
+
+```{r}
+
+filtered_flights <- flights_dt |> 
+  filter(arr_time < dep_time)
+
+filtered_flights_inital <- select(filtered_flights, arr_time, dep_time)
+
+filtered_flights_inital
 ```
 
 These are overnight flights. We used the same date information for both the departure and the arrival times, but these flights arrived on the following day. We can fix this by adding `days(1)` to the arrival time of each overnight flight.
@@ -204,7 +215,9 @@ flights_dt |>
 ```
 
 ```{r}
-flights_dt
+filtered_flights_corrected <- select(flights_dt, arr_time, dep_time)
+
+filtered_flights_corrected
 ```
 
 ## Additional exercises
